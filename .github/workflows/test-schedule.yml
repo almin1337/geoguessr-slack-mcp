@@ -1,0 +1,34 @@
+name: Test Schedule
+
+on:
+  schedule:
+    # Test: Run every 5 minutes to verify GitHub recognizes scheduled workflows
+    - cron: '*/5 * * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Test scheduled workflow
+        run: |
+          echo "✅ Scheduled workflow is working!"
+          echo "Current UTC time: $(date -u)"
+          echo "This is a test to verify GitHub Actions scheduled workflows work."
+          echo "If you see this, scheduled workflows are functioning correctly."
+      
+      - name: Create test file
+        run: |
+          echo "Test run at $(date -u)" >> test-schedule-output.txt
+          cat test-schedule-output.txt
+      
+      - name: Commit test file
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add test-schedule-output.txt || true
+          git commit -m "Test: Scheduled workflow ran at $(date -u)" || true
+          git push || true
