@@ -31,7 +31,7 @@ jobs:
           GEOGUESSR_COOKIE: ${{ secrets.GEOGUESSR_COOKIE }}
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
-          GITHUB_GIST_ID: ${{ secrets.GITHUB_GIST_ID }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIST_ID: ${{ secrets.GIST_ID }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           python daily_softhouse_challenge.py

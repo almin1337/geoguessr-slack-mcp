@@ -66,8 +66,10 @@ Since GitHub Actions doesn't persist files between runs, we'll use a GitHub Gist
    | `GEOGUESSR_COOKIE` | Your `_ncfa` cookie value from GeoGuessr |
    | `SLACK_BOT_TOKEN` | Your Slack bot token (starts with `xoxb-`) |
    | `SLACK_CHANNEL_ID` | Your Slack channel ID (starts with `C`) |
-   | `GITHUB_GIST_ID` | The Gist ID from Step 3 |
-   | `GITHUB_TOKEN` | The Personal Access Token from Step 4 |
+   | `GIST_ID` | The Gist ID from Step 3 |
+   | `GH_TOKEN` | The Personal Access Token from Step 4 |
+   
+   **Note:** Secret names cannot start with `GITHUB_` (reserved by GitHub), so we use `GIST_ID` and `GH_TOKEN` instead.
 
 ## Step 6: Adjust Timezone (If Needed)
 

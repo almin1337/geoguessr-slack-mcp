@@ -14,8 +14,8 @@ from typing import Optional
 def load_state() -> dict:
     """Load state: last_challenge_id, last_challenge_date (YYYY-MM-DD), challenges_today_count."""
     # Check if we're in GitHub Actions and have Gist configured
-    gist_id = os.getenv("GITHUB_GIST_ID")
-    github_token = os.getenv("GITHUB_TOKEN")
+    gist_id = os.getenv("GIST_ID")
+    github_token = os.getenv("GH_TOKEN")
     
     if gist_id and github_token:
         return _load_from_gist(gist_id, github_token)
@@ -32,8 +32,8 @@ def save_state(last_challenge_id: str, last_challenge_date: str, challenges_toda
     }
     
     # Check if we're in GitHub Actions and have Gist configured
-    gist_id = os.getenv("GITHUB_GIST_ID")
-    github_token = os.getenv("GITHUB_TOKEN")
+    gist_id = os.getenv("GIST_ID")
+    github_token = os.getenv("GH_TOKEN")
     
     if gist_id and github_token:
         _save_to_gist(gist_id, github_token, state_data)
