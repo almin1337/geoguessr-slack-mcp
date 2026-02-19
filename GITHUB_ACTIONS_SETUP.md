@@ -46,11 +46,14 @@ Since GitHub Actions doesn't persist files between runs, we'll use a GitHub Gist
 
 1. Go to https://github.com/settings/tokens
 2. Click **Generate new token** → **Generate new token (classic)**
+   - **Important:** Use "classic" token (not fine-grained) to get the full `gist` scope
 3. Name: `GeoGuessr Bot State Storage`
 4. Select scopes:
-   - ✅ `gist` (to read/write Gists)
-5. Click **Generate token**
-6. **Copy the token immediately** (you won't see it again!)
+   - ✅ `gist` (this scope provides both read and write access to Gists)
+   - **Note:** If you only see "Create gists" (fine-grained token), use a classic token instead
+5. Expiration: Choose "No expiration" (or set a long expiration date)
+6. Click **Generate token**
+7. **Copy the token immediately** (you won't see it again!)
 
 ## Step 5: Add GitHub Secrets
 
