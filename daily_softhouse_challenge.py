@@ -96,16 +96,17 @@ def main() -> None:
     
     today_iso = cet_now.strftime("%Y-%m-%d")
     today_str = cet_now.strftime("%d/%m/%Y")
-    time_hour_str = f"{cet_now.hour:02d}:00"  # Format as "08:00", "09:00", etc. in CET
 
     state = load_state()
     prev_id = state.get("last_challenge_id")
     last_date = state.get("last_challenge_date", "")
-    # This run's number for today: first of the day = 1, second = 2, ...
+    # This run's number for today: first of the day = 1, second = 2
     if last_date == today_iso:
         challenge_number = state.get("challenges_today_count", 0) + 1
     else:
         challenge_number = 1
+    # Ensure challenge_number is 1 or 2 (only two runs per day)
+    challenge_number = min(challenge_number, 2)
     # Date to show for "previous challenge results" (same day or yesterday)
     if last_date == today_iso:
         results_date_str = today_str
@@ -171,7 +172,6 @@ def main() -> None:
         challenge_number=challenge_number,
         results_date_str=results_date_str,
         leaderboard_data=previous_leaderboard,
-        time_hour=time_hour_str,
     )
 
     slack = SlackClient(SLACK_BOT_TOKEN)

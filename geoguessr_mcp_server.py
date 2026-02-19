@@ -580,14 +580,9 @@ def format_softhouse_daily(
     leaderboard_data: list,
     challenge_number: int = 1,
     results_date_str: str = "",
-    time_hour: str = "",
 ) -> tuple[str, list]:
-    """Format Softhouse daily challenge message. If challenge_number > 1, appends ' #2', '#3', etc. Results section uses results_date_str for 'Previous challenge results (DD/MM/YYYY)'. If time_hour is provided, adds it to the title."""
-    header_title = f"GeoGuessr - Softhouse Daily Challenge {today_date}"
-    if time_hour:
-        header_title += f" {time_hour}"
-    if challenge_number > 1:
-        header_title += f" #{challenge_number}"
+    """Format Softhouse daily challenge message. challenge_number is always shown (#1 or #2). Results section uses results_date_str for 'Previous challenge results (DD/MM/YYYY)'."""
+    header_title = f"GeoGuessr - Softhouse Daily Challenge {today_date} #{challenge_number}"
     text = f"{header_title}\n\nMap: {map_name}\nTime: {time_str}\nRounds: {rounds}\nMoves: {move_limit if move_limit else 'Unlimited'}\n\nPlay here: {challenge_url}"
     blocks = [
         {
