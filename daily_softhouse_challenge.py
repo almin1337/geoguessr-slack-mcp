@@ -28,31 +28,9 @@ from geoguessr_mcp_server import (
 GEOGUESSR_COOKIE = os.getenv("GEOGUESSR_COOKIE")
 SLACK_BOT_TOKEN = os.getenv("SLACK_BOT_TOKEN")
 SLACK_CHANNEL_ID = os.getenv("SLACK_CHANNEL_ID")
-STATE_FILE = root / ".daily_challenge_state"
 
-
-def load_state() -> dict:
-    """Load state: last_challenge_id, last_challenge_date (YYYY-MM-DD), challenges_today_count."""
-    if not STATE_FILE.exists():
-        return {}
-    try:
-        return json.loads(STATE_FILE.read_text())
-    except Exception:
-        return {}
-
-
-def save_state(last_challenge_id: str, last_challenge_date: str, challenges_today_count: int) -> None:
-    """Save state after posting a challenge."""
-    STATE_FILE.write_text(
-        json.dumps(
-            {
-                "last_challenge_id": last_challenge_id,
-                "last_challenge_date": last_challenge_date,
-                "challenges_today_count": challenges_today_count,
-            },
-            indent=2,
-        )
-    )
+# Import state storage (supports file-based and GitHub Gist)
+from state_storage import load_state, save_state
 
 
 def load_previous_challenge_id() -> str | None:
