@@ -121,12 +121,19 @@ def main() -> None:
     previous_leaderboard = []
     if prev_id:
         try:
+            print(f"Fetching results for previous challenge: {prev_id}", file=sys.stderr)
             # GeoGuessr only returns highscores if our account has played the challenge.
             # "Play" it once (timed-out rounds) so the API exposes the scoreboard.
             client.ensure_played_challenge(prev_id)
             previous_leaderboard = client.get_challenge_highscores(prev_id)
+            if previous_leaderboard:
+                print(f"Found {len(previous_leaderboard)} results from previous challenge", file=sys.stderr)
+            else:
+                print("No results found for previous challenge (may not have any players yet)", file=sys.stderr)
         except Exception as e:
             print(f"Warning: could not fetch previous challenge results: {e}", file=sys.stderr)
+            import traceback
+            traceback.print_exc(file=sys.stderr)
 
     challenge_url = create_challenge_api(GEOGUESSR_COOKIE)
     if not challenge_url:
