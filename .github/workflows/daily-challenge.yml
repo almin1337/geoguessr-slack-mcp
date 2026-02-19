@@ -1,0 +1,35 @@
+name: Daily GeoGuessr Challenge
+
+on:
+  schedule:
+    # Run hourly from 8:00 to 15:00 UTC on weekdays (Mon-Fri)
+    # Adjust timezone: If you're UTC+1, 8:00 local = 7:00 UTC, so use '0 7-14 * * 1-5'
+    # If you're UTC-5, 8:00 local = 13:00 UTC, so use '0 13-20 * * 1-5'
+    - cron: '0 8-15 * * 1-5'  # Every hour from 8-15 UTC, Mon-Fri
+  workflow_dispatch:  # Allow manual trigger from GitHub UI
+
+jobs:
+  run-challenge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install playwright
+          playwright install chromium
+      
+      - name: Run daily challenge
+        env:
+          GEOGUESSR_COOKIE: ${{ secrets.GEOGUESSR_COOKIE }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+        run: |
+          python daily_softhouse_challenge.py

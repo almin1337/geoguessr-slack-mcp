@@ -1,0 +1,12 @@
+.env
+.daily_challenge_state
+.daily_challenge_last_run
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+ENV/
+.venv

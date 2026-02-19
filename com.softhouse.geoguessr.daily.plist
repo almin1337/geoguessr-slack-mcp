@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.softhouse.geoguessr.daily</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/almindurmis/Documents/Code/geoguessr-slack-mcp/venv/bin/python</string>
+        <string>/Users/almindurmis/Documents/Code/geoguessr-slack-mcp/run_daily_if_needed.py</string>
+    </array>
+    <key>WorkingDirectory</key>
+    <string>/Users/almindurmis/Documents/Code/geoguessr-slack-mcp</string>
+    <key>StartInterval</key>
+    <integer>3600</integer>
+    <key>RunAtLoad</key>
+    <false/>
+    <key>StandardOutPath</key>
+    <string>/tmp/geoguessr_softhouse.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/geoguessr_softhouse_err.log</string>
+</dict>
+</plist>
