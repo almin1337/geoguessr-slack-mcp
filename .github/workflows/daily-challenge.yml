@@ -2,10 +2,11 @@ name: Daily GeoGuessr Challenge
 
 on:
   schedule:
-    # Run hourly from 8:00 to 15:00 UTC on weekdays (Mon-Fri)
-    # Adjust timezone: If you're UTC+1, 8:00 local = 7:00 UTC, so use '0 7-14 * * 1-5'
-    # If you're UTC-5, 8:00 local = 13:00 UTC, so use '0 13-20 * * 1-5'
-    - cron: '0 8-15 * * 1-5'  # Every hour from 8-15 UTC, Mon-Fri
+    # Run hourly from 8:00 to 15:00 CET on weekdays (Mon-Fri)
+    # CET is UTC+1 (winter) or UTC+2 (summer/CEST)
+    # Using UTC+1 schedule (7:00-14:00 UTC) = 8:00-15:00 CET in winter
+    # Note: In summer (CEST), this will run 1 hour earlier (7:00-14:00 CEST)
+    - cron: '0 7-14 * * 1-5'  # Every hour from 7-14 UTC = 8-15 CET (winter), 7-14 CEST (summer)
   workflow_dispatch:  # Allow manual trigger from GitHub UI
 
 jobs:

@@ -10,6 +10,7 @@ import sys
 import json
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
+import pytz
 
 # Load .env from project root
 root = Path(__file__).resolve().parent
@@ -88,10 +89,14 @@ def main() -> None:
         print("ERROR: SLACK_BOT_TOKEN and SLACK_CHANNEL_ID must be set", file=sys.stderr)
         sys.exit(1)
 
-    today = datetime.now(timezone.utc)
-    today_iso = today.strftime("%Y-%m-%d")
-    today_str = today.strftime("%d/%m/%Y")
-    time_hour_str = f"{today.hour:02d}:00"  # Format as "08:00", "09:00", etc.
+    # Get current time in CET (Central European Time)
+    utc_now = datetime.now(timezone.utc)
+    cet_tz = pytz.timezone('Europe/Paris')  # CET/CEST timezone
+    cet_now = utc_now.astimezone(cet_tz)
+    
+    today_iso = cet_now.strftime("%Y-%m-%d")
+    today_str = cet_now.strftime("%d/%m/%Y")
+    time_hour_str = f"{cet_now.hour:02d}:00"  # Format as "08:00", "09:00", etc. in CET
 
     state = load_state()
     prev_id = state.get("last_challenge_id")
