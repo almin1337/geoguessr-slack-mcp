@@ -15,6 +15,9 @@ on:
 jobs:
   run-challenge:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      gists: write  # Required to update the Gist for state storage
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
