@@ -16,8 +16,8 @@ jobs:
   run-challenge:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      gists: write  # Required to update the Gist for state storage
+      contents: read  # Read-only access to repository
+      # Gist access is handled via GH_TOKEN secret (Personal Access Token with gist scope)
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
