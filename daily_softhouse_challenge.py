@@ -91,6 +91,7 @@ def main() -> None:
     today = datetime.now(timezone.utc)
     today_iso = today.strftime("%Y-%m-%d")
     today_str = today.strftime("%d/%m/%Y")
+    time_hour_str = f"{today.hour:02d}:00"  # Format as "08:00", "09:00", etc.
 
     state = load_state()
     prev_id = state.get("last_challenge_id")
@@ -158,6 +159,7 @@ def main() -> None:
         challenge_number=challenge_number,
         results_date_str=results_date_str,
         leaderboard_data=previous_leaderboard,
+        time_hour=time_hour_str,
     )
 
     slack = SlackClient(SLACK_BOT_TOKEN)
