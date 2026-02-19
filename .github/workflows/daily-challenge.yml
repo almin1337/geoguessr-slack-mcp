@@ -6,10 +6,7 @@ on:
     # CET is UTC+1 (winter) or UTC+2 (summer/CEST)
     # Using UTC+1 schedule (7:00-14:00 UTC) = 8:00-15:00 CET in winter
     # Note: In summer (CEST), this will run 1 hour earlier (7:00-14:00 CEST)
-    # TEST: Running every 5 minutes to verify GitHub recognizes the schedule
-    # TODO: Change back to '0 7-14 * * 1-5' after confirming it works
-    - cron: '*/5 * * * *'  # TEST: Every 5 minutes
-    # - cron: '0 7-14 * * 1-5'  # Every hour from 7-14 UTC = 8-15 CET (winter), 7-14 CEST (summer)
+    - cron: '0 7-14 * * 1-5'  # Every hour from 7-14 UTC = 8-15 CET (winter), 7-14 CEST (summer)
   workflow_dispatch:  # Allow manual trigger from GitHub UI
 
 jobs:
