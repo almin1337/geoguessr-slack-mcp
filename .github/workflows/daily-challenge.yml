@@ -1,7 +1,7 @@
 name: Daily GeoGuessr Challenge
 
 on:
-  # Schedule is via external cron (cron-job.org) at 9:20 and 12:20 CET – see EXTERNAL_CRON_SETUP.md
+  # Schedule is via external cron (cron-job.org) at 9:00 and 12:00 CET – see EXTERNAL_CRON_SETUP.md
   workflow_dispatch:  # Triggered by external cron (API) or manual "Run workflow"
 
 jobs:

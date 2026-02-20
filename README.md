@@ -67,9 +67,13 @@ Replace `/path/to/geoguessr-slack-mcp` and `/path/to/venv/bin/python` with your 
 python daily_softhouse_challenge.py
 ```
 
+## Scheduled runs (9:00 & 12:00 CET, weekdays)
+
+The job is triggered by an **external cron** (e.g. cron-job.org) that calls the GitHub Actions workflow. See **EXTERNAL_CRON_SETUP.md** for setup. To show **previous challenge results** in each post, add **GIST_ID** and **GH_TOKEN** to the repo secrets (see that doc).
+
 ## Manual extra challenges (same day)
 
-You can post **more than one challenge on the same day**. Challenges run automatically hourly from 8:00-15:00 on weekdays; you can also trigger manually.
+You can also run the script manually to post an extra challenge the same day.
 
 **What to do for an extra challenge the same day**
 

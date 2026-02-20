@@ -23,6 +23,8 @@ GitHub Actions can run your script on a schedule without needing a server.
      - `GEOGUESSR_COOKIE`: Your `_ncfa` cookie value
      - `SLACK_BOT_TOKEN`: Your Slack bot token
      - `SLACK_CHANNEL_ID`: Your Slack channel ID
+     - `GIST_ID`: (Required for previous challenge results.) Create a secret Gist, add a file e.g. `state.json` with `{}`, copy the Gist ID from the URL.
+     - `GH_TOKEN`: (Required for previous challenge results.) A Personal Access Token with **gist** scope.
 
 3. **Create `.github/workflows/daily-challenge.yml`**:
    ```yaml

@@ -1,6 +1,6 @@
 # Trigger Workflow via External Cron (No Laptop Required)
 
-The workflow is triggered by an **external cron service** (e.g. cron-job.org) that calls the GitHub API at 9:20 and 12:20 CET on weekdays. No GitHub schedule, no laptop needed.
+The workflow is triggered by an **external cron service** (e.g. cron-job.org) that calls the GitHub API at 9:00 and 12:00 CET on weekdays. No GitHub schedule, no laptop needed.
 
 ---
 
@@ -18,14 +18,15 @@ The workflow is triggered by an **external cron service** (e.g. cron-job.org) th
 ### Step 2: Create cron jobs at cron-job.org
 
 1. Go to https://cron-job.org and create a free account (or log in).
-2. **Create first job – 9:20 CET**
-   - **Title:** GeoGuessr Challenge 9:20
+2. **Create first job – 9:00 CET**
+   - **Title:** GeoGuessr Challenge 9:00
    - **URL:**  
      `https://api.github.com/repos/almin1337/geoguessr-slack-mcp/actions/workflows/daily-challenge.yml/dispatches`
    - **Schedule:**  
-     - Time: **09:20**  
+     - Time: **09:00**  
      - Timezone: **Europe/Paris** (CET/CEST)  
      - Days: **Monday–Friday** (weekdays only)
+   - Open the **Advanced** section; there set **Request method**, **Request headers**, and **Request body**:
    - **Request method:** **POST**
    - **Request headers:**
      - `Accept`: `application/vnd.github.v3+json`
@@ -35,16 +36,16 @@ The workflow is triggered by an **external cron service** (e.g. cron-job.org) th
      `{"ref":"main"}`
    - Save the job.
 
-3. **Create second job – 12:20 CET**
+3. **Create second job – 12:00 CET**
    - Same as above, but:
-   - **Title:** GeoGuessr Challenge 12:20
-   - **Schedule → Time:** **12:20** (same timezone and weekdays)
+   - **Title:** GeoGuessr Challenge 12:00
+   - **Schedule → Time:** **12:00** (same timezone and weekdays)
    - Same URL, headers, and body.
    - Save the job.
 
 ### Step 3: Verify
 
-- After 9:20 or 12:20 CET on a weekday, check:  
+- After 9:00 or 12:00 CET on a weekday, check:  
   https://github.com/almin1337/geoguessr-slack-mcp/actions  
 - You should see a new run triggered by “workflow_dispatch” (and in the cron-job.org dashboard you’ll see the request was sent).
 
@@ -63,7 +64,7 @@ Any service that can send an HTTP POST on a schedule works. Use the same details
   - `Content-Type: application/json`
 - **Body:** `{"ref":"main"}`
 
-Schedule two jobs: one at 9:20 CET and one at 12:20 CET, weekdays only (Europe/Paris or your CET timezone).
+Schedule two jobs: one at 9:00 CET and one at 12:00 CET, weekdays only (Europe/Paris or your CET timezone).
 
 ---
 
@@ -82,7 +83,24 @@ Schedule two jobs: one at 9:20 CET and one at 12:20 CET, weekdays only (Europe/P
 | API endpoint        | `POST https://api.github.com/repos/almin1337/geoguessr-slack-mcp/actions/workflows/daily-challenge.yml/dispatches` |
 | Header `Authorization` | `token YOUR_GITHUB_TOKEN`                                          |
 | Body                | `{"ref":"main"}`                                                      |
-| Times (CET)         | 9:20 and 12:20                                                        |
+| Times (CET)         | 9:00 and 12:00                                                        |
 | Days                | Monday–Friday                                                          |
 
-Once these two cron jobs are set up, your workflow will run at 9:20 and 12:20 CET on weekdays **without using your laptop** and without relying on GitHub’s built-in schedule.
+Once these two cron jobs are set up, your workflow will run at 9:00 and 12:00 CET on weekdays **without using your laptop** and without relying on GitHub's built-in schedule.
+
+---
+
+## Previous challenge results (required secrets)
+
+Each post can show **"Previous challenge results"** (the leaderboard from the last run). For that to work, state must persist between workflow runs. The workflow uses a **GitHub Gist** for state when these **repository secrets** are set:
+
+| Secret       | Description |
+|-------------|-------------|
+| `GIST_ID`   | ID of a (secret) Gist used to store last challenge ID and date. Create at https://gist.github.com — e.g. add a file `state.json` with content `{}` — and copy the ID from the URL: `https://gist.github.com/USERNAME/GIST_ID`. |
+| `GH_TOKEN`  | A Personal Access Token with **gist** scope (or the same token you use for cron-job.org if it has **repo**). Create at https://github.com/settings/tokens. |
+
+Add them under **Settings → Secrets and variables → Actions** for the repo.
+
+- If **GIST_ID** and **GH_TOKEN** are **not** set, each run starts with no saved state, so there is no "previous" challenge and the results block will not appear.
+- After you add them, the **next** run will save state; the run **after that** will show the previous challenge's results.
+
