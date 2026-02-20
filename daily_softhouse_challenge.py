@@ -4,7 +4,11 @@ Post GeoGuessr Softhouse Daily Challenge to Slack every day.
 Run at 9:00 via cron. Creates a new challenge (login required), includes yesterday's results.
 Title: "GeoGuessr - Softhouse Daily Challenge DD/MM/YYYY"
 Results format: Rank | Name | Result | Time(s)
+
+Use --dry-run to test without creating a challenge or posting to Slack (loads state, fetches
+previous results, and prints the message that would be sent).
 """
+import argparse
 import os
 import sys
 import json
@@ -82,10 +86,19 @@ def create_challenge_browser(cookie: str) -> str | None:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Post GeoGuessr Softhouse Daily Challenge to Slack.")
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Load state, fetch previous results, and print the message that would be sent. No challenge created, no Slack post.",
+    )
+    args = parser.parse_args()
+    dry_run = args.dry_run
+
     if not GEOGUESSR_COOKIE:
         print("ERROR: GEOGUESSR_COOKIE not set", file=sys.stderr)
         sys.exit(1)
-    if not SLACK_BOT_TOKEN or not SLACK_CHANNEL_ID:
+    if not dry_run and (not SLACK_BOT_TOKEN or not SLACK_CHANNEL_ID):
         print("ERROR: SLACK_BOT_TOKEN and SLACK_CHANNEL_ID must be set", file=sys.stderr)
         sys.exit(1)
 
@@ -136,31 +149,40 @@ def main() -> None:
             import traceback
             traceback.print_exc(file=sys.stderr)
 
-    challenge_url = create_challenge_api(GEOGUESSR_COOKIE)
-    if not challenge_url:
-        print("API create failed, trying browser...", file=sys.stderr)
-        challenge_url = create_challenge_browser(GEOGUESSR_COOKIE)
-    if not challenge_url:
-        print("ERROR: Could not create challenge", file=sys.stderr)
-        sys.exit(1)
-
-    challenge_id = challenge_url.rstrip("/").split("/challenge/")[-1].split("?")[0]
-    save_state(challenge_id, today_iso, challenge_number)
-
-    try:
-        details = client.get_challenge_details(challenge_id)
-        map_name = details.get("map", {}).get("name", "World")
-        ch = details.get("challenge", {})
-        time_limit = ch.get("timeLimit", 90)
-        rounds = ch.get("roundCount", 5)
-        move_limit = ch.get("moveLimit", 0)
-    except Exception:
+    if dry_run:
+        # Don't create a real challenge; use placeholder and print message only
+        challenge_url = "https://www.geoguessr.com/challenge/DRY_RUN"
         map_name = "World"
-        time_limit = 90
+        time_str = "1m 30s per round"
         rounds = 5
         move_limit = 0
+        print("[DRY RUN] No challenge created, no state saved, no Slack post.", file=sys.stderr)
+    else:
+        challenge_url = create_challenge_api(GEOGUESSR_COOKIE)
+        if not challenge_url:
+            print("API create failed, trying browser...", file=sys.stderr)
+            challenge_url = create_challenge_browser(GEOGUESSR_COOKIE)
+        if not challenge_url:
+            print("ERROR: Could not create challenge", file=sys.stderr)
+            sys.exit(1)
 
-    time_str = f"{time_limit // 60}m {time_limit % 60}s per round" if time_limit else "No time limit"
+        challenge_id = challenge_url.rstrip("/").split("/challenge/")[-1].split("?")[0]
+        save_state(challenge_id, today_iso, challenge_number)
+
+        try:
+            details = client.get_challenge_details(challenge_id)
+            map_name = details.get("map", {}).get("name", "World")
+            ch = details.get("challenge", {})
+            time_limit = ch.get("timeLimit", 90)
+            rounds = ch.get("roundCount", 5)
+            move_limit = ch.get("moveLimit", 0)
+        except Exception:
+            map_name = "World"
+            time_limit = 90
+            rounds = 5
+            move_limit = 0
+
+        time_str = f"{time_limit // 60}m {time_limit % 60}s per round" if time_limit else "No time limit"
 
     text, blocks = format_softhouse_daily(
         challenge_url=challenge_url,
@@ -173,6 +195,13 @@ def main() -> None:
         results_date_str=results_date_str,
         leaderboard_data=previous_leaderboard,
     )
+
+    if dry_run:
+        print("\n--- Message that would be posted to Slack ---\n", file=sys.stderr)
+        print(text)
+        print("\n--- Blocks (JSON) ---", file=sys.stderr)
+        print(json.dumps(blocks, indent=2))
+        return
 
     slack = SlackClient(SLACK_BOT_TOKEN)
     result = slack.post_message(SLACK_CHANNEL_ID, text, blocks)
