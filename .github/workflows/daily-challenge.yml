@@ -1,14 +1,8 @@
 name: Daily GeoGuessr Challenge
 
 on:
-  schedule:
-    # Run twice daily at 9:00 and 12:00 CET on weekdays (Mon-Fri)
-    # CET is UTC+1 (winter) or UTC+2 (summer/CEST)
-    # 9:00 CET = 8:00 UTC (winter) or 7:00 UTC (summer)
-    # 12:00 CET = 11:00 UTC (winter) or 10:00 UTC (summer)
-    # Using UTC+1 schedule: 8:00 and 11:00 UTC = 9:00 and 12:00 CET in winter
-    - cron: '0 8,11 * * 1-5'  # 8:00 and 11:00 UTC = 9:00 and 12:00 CET (winter), 8:00 and 11:00 CEST (summer)
-  workflow_dispatch:  # Allow manual trigger from GitHub UI
+  # Schedule is via external cron (cron-job.org) at 9:20 and 12:20 CET – see EXTERNAL_CRON_SETUP.md
+  workflow_dispatch:  # Triggered by external cron (API) or manual "Run workflow"
 
 jobs:
   run-challenge:
