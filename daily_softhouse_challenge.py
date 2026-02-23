@@ -36,6 +36,8 @@ SLACK_CHANNEL_ID = os.getenv("SLACK_CHANNEL_ID")
 
 # Import state storage (supports file-based and GitHub Gist)
 from state_storage import load_state, save_state
+# Same approach as fetch_challenge_results.py for previous challenge leaderboard
+from challenge_results import get_leaderboard_for_challenge
 
 
 def load_previous_challenge_id() -> str | None:
@@ -115,7 +117,11 @@ def main() -> None:
     last_date = state.get("last_challenge_date", "")
     # This run's number for today: first of the day = 1, second = 2
     if last_date == today_iso:
-        challenge_number = state.get("challenges_today_count", 0) + 1
+        count = state.get("challenges_today_count", 0)
+        # If we have a previous challenge from today but no count (e.g. old Gist format), we're run #2
+        if count == 0 and prev_id:
+            count = 1
+        challenge_number = count + 1
     else:
         challenge_number = 1
     # Ensure challenge_number is 1 or 2 (only two runs per day)
@@ -136,10 +142,8 @@ def main() -> None:
     if prev_id:
         try:
             print(f"Fetching results for previous challenge: {prev_id}", file=sys.stderr)
-            # GeoGuessr only returns highscores if our account has played the challenge.
-            # "Play" it once (timed-out rounds) so the API exposes the scoreboard.
-            client.ensure_played_challenge(prev_id)
-            previous_leaderboard = client.get_challenge_highscores(prev_id)
+            # Same approach as fetch_challenge_results.py: try highscores first, then ensure_played + retry
+            previous_leaderboard = get_leaderboard_for_challenge(GEOGUESSR_COOKIE, prev_id)
             if previous_leaderboard:
                 print(f"Found {len(previous_leaderboard)} results from previous challenge", file=sys.stderr)
             else:
@@ -194,6 +198,7 @@ def main() -> None:
         challenge_number=challenge_number,
         results_date_str=results_date_str,
         leaderboard_data=previous_leaderboard,
+        previous_challenge_id=prev_id or "",
     )
 
     if dry_run:

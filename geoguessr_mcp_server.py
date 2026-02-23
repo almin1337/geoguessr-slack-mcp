@@ -580,8 +580,11 @@ def format_softhouse_daily(
     leaderboard_data: list,
     challenge_number: int = 1,
     results_date_str: str = "",
+    previous_challenge_id: str = "",
 ) -> tuple[str, list]:
-    """Format Softhouse daily challenge message. challenge_number is always shown (#1 or #2). Results section uses results_date_str for 'Previous challenge results (DD/MM/YYYY)'."""
+    """Format Softhouse daily challenge message. challenge_number is always shown (#1 or #2).
+    If leaderboard_data and previous_challenge_id are set, results are shown as:
+    Leaderboard for Challenge: {id}, Total Players: N, table with Rank | Player Name | Score | Time (s)."""
     header_title = f"GeoGuessr - Softhouse Daily Challenge {today_date} #{challenge_number}"
     text = f"{header_title}\n\nMap: {map_name}\nTime: {time_str}\nRounds: {rounds}\nMoves: {move_limit if move_limit else 'Unlimited'}\n\nPlay here: {challenge_url}"
     blocks = [
@@ -600,38 +603,37 @@ def format_softhouse_daily(
         },
     ]
     if leaderboard_data and len(leaderboard_data) > 0:
-        # Aligned columns: Rank (4), Name (20), Result (8), Time(s) (6) — in monospace code block
-        W_RANK, W_NAME, W_RESULT, W_TIME = 4, 20, 8, 6
-        header_line = "Rank".center(W_RANK) + " | " + "Name".ljust(W_NAME) + " | " + "Result".rjust(W_RESULT) + " | " + "Time(s)".rjust(W_TIME)
-        sep_line = "-" * W_RANK + "-+-" + "-" * W_NAME + "-+-" + "-" * W_RESULT + "-+-" + "-" * W_TIME
+        # Format: Leaderboard for Challenge: {id}, Total Players: N, Rank | Player Name | Score | Time (s)
+        W_RANK, W_NAME, W_SCORE, W_TIME = 4, 20, 8, 8
+        header_line = "Rank".ljust(W_RANK) + " | " + "Player Name".ljust(W_NAME) + " | " + "Score".rjust(W_SCORE) + " | " + "Time (s)".rjust(W_TIME)
+        sep_line = "-" * W_RANK + "-+-" + "-" * W_NAME + "-+-" + "-" * W_SCORE + "-+-" + "-" * W_TIME
         table_lines = [header_line, sep_line]
         for i, entry in enumerate(leaderboard_data[:10], 1):
             nick = (entry.get("nick") or "Unknown")[:W_NAME].ljust(W_NAME)
-            score_str = f"{entry.get('totalScore', 0):,}".rjust(W_RESULT)
-            time_str = str(entry.get("totalTime", 0)).rjust(W_TIME)
-            table_lines.append(str(i).rjust(W_RANK) + " | " + nick + " | " + score_str + " | " + time_str)
+            score_str = f"{entry.get('totalScore', 0):,}".rjust(W_SCORE)
+            time_val = str(entry.get("totalTime", 0)).rjust(W_TIME)
+            table_lines.append(str(i).rjust(W_RANK) + " | " + nick + " | " + score_str + " | " + time_val)
         table_block = "```\n" + "\n".join(table_lines) + "\n```"
-        results_title = "*📊 Previous challenge results*"
-        if results_date_str:
-            results_title += f" ({results_date_str})"
-        results_title += "*"
+        n = len(leaderboard_data)
+        results_header = f"*Leaderboard for Challenge:* `{previous_challenge_id}`\n*Total Players:* {n}\n\n"
         blocks.append({
             "type": "section",
-            "text": {"type": "mrkdwn", "text": results_title + "\n" + table_block},
+            "text": {"type": "mrkdwn", "text": results_header + table_block},
         })
     blocks.append({
         "type": "actions",
         "elements": [{"type": "button", "text": {"type": "plain_text", "text": "Play Challenge"}, "url": challenge_url, "style": "primary"}],
     })
     if leaderboard_data and len(leaderboard_data) > 0:
-        W_RANK, W_NAME, W_RESULT, W_TIME = 4, 20, 8, 6
-        header_line = "Rank".center(W_RANK) + " | " + "Name".ljust(W_NAME) + " | " + "Result".rjust(W_RESULT) + " | " + "Time(s)".rjust(W_TIME)
-        sep_line = "-" * W_RANK + "-+-" + "-" * W_NAME + "-+-" + "-" * W_RESULT + "-+-" + "-" * W_TIME
-        text += f"\n\n📊 Previous challenge results ({results_date_str or 'previous'}):\n"
+        W_RANK, W_NAME, W_SCORE, W_TIME = 4, 20, 8, 8
+        header_line = "Rank".ljust(W_RANK) + " | " + "Player Name".ljust(W_NAME) + " | " + "Score".rjust(W_SCORE) + " | " + "Time (s)".rjust(W_TIME)
+        sep_line = "-" * W_RANK + "-+-" + "-" * W_NAME + "-+-" + "-" * W_SCORE + "-+-" + "-" * W_TIME
+        n = len(leaderboard_data)
+        text += f"\n\nLeaderboard for Challenge: {previous_challenge_id}\nTotal Players: {n}\n\n"
         text += header_line + "\n" + sep_line + "\n"
         for i, entry in enumerate(leaderboard_data[:10], 1):
             nick = (entry.get("nick") or "Unknown")[:W_NAME].ljust(W_NAME)
-            text += str(i).rjust(W_RANK) + " | " + nick + " | " + f"{entry.get('totalScore', 0):,}".rjust(W_RESULT) + " | " + str(entry.get("totalTime", 0)).rjust(W_TIME) + "\n"
+            text += str(i).rjust(W_RANK) + " | " + nick + " | " + f"{entry.get('totalScore', 0):,}".rjust(W_SCORE) + " | " + str(entry.get("totalTime", 0)).rjust(W_TIME) + "\n"
     return text, blocks
 
 
