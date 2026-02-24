@@ -129,6 +129,9 @@ def main() -> None:
         challenge_number = 1
     # Ensure challenge_number is 1 or 2 (only two runs per day)
     challenge_number = min(challenge_number, 2)
+    # If we have a previous challenge from today, we're the second run → show #2
+    if challenge_number == 1 and prev_id and last_date == today_iso:
+        challenge_number = 2
     # Date to show for "previous challenge results" (same day or yesterday)
     if last_date == today_iso:
         results_date_str = today_str
@@ -191,6 +194,8 @@ def main() -> None:
 
         time_str = f"{time_limit // 60}m {time_limit % 60}s per round" if time_limit else "No time limit"
 
+    # Previous challenge was #1 if we're #2 today; otherwise yesterday's run (treat as #2)
+    previous_challenge_number = 1 if challenge_number == 2 else 2
     text, blocks = format_softhouse_daily(
         challenge_url=challenge_url,
         map_name=map_name,
@@ -202,6 +207,7 @@ def main() -> None:
         results_date_str=results_date_str,
         leaderboard_data=previous_leaderboard,
         previous_challenge_id=prev_id or "",
+        previous_challenge_number=previous_challenge_number,
     )
 
     if dry_run:

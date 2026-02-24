@@ -581,10 +581,11 @@ def format_softhouse_daily(
     challenge_number: int = 1,
     results_date_str: str = "",
     previous_challenge_id: str = "",
+    previous_challenge_number: int = 1,
 ) -> tuple[str, list]:
     """Format Softhouse daily challenge message. challenge_number is always shown (#1 or #2).
     If leaderboard_data and previous_challenge_id are set, results are shown as:
-    Leaderboard for Challenge: {id}, Total Players: N, table with Rank | Player Name | Score | Time (s)."""
+    Leaderboard for Challenge: {id} from {date} #{number}, Total Players: N, table."""
     header_title = f"GeoGuessr - Softhouse Daily Challenge {today_date} #{challenge_number}"
     text = f"{header_title}\n\nMap: {map_name}\nTime: {time_str}\nRounds: {rounds}\nMoves: {move_limit if move_limit else 'Unlimited'}\n\nPlay here: {challenge_url}"
     blocks = [
@@ -603,7 +604,7 @@ def format_softhouse_daily(
         },
     ]
     if leaderboard_data and len(leaderboard_data) > 0:
-        # Format: Leaderboard for Challenge: {id}, Total Players: N, Rank | Player Name | Score | Time (s)
+        # Format: Leaderboard for Challenge: {id} from {date} #{number}, Total Players: N
         W_RANK, W_NAME, W_SCORE, W_TIME = 4, 20, 8, 8
         header_line = "Rank".ljust(W_RANK) + " | " + "Player Name".ljust(W_NAME) + " | " + "Score".rjust(W_SCORE) + " | " + "Time (s)".rjust(W_TIME)
         sep_line = "-" * W_RANK + "-+-" + "-" * W_NAME + "-+-" + "-" * W_SCORE + "-+-" + "-" * W_TIME
@@ -615,7 +616,9 @@ def format_softhouse_daily(
             table_lines.append(str(i).rjust(W_RANK) + " | " + nick + " | " + score_str + " | " + time_val)
         table_block = "```\n" + "\n".join(table_lines) + "\n```"
         n = len(leaderboard_data)
-        results_header = f"*Leaderboard for Challenge:* `{previous_challenge_id}`\n*Total Players:* {n}\n\n"
+        date_part = f" from {results_date_str}" if results_date_str else ""
+        num_part = f" #{previous_challenge_number}"
+        results_header = f"*Leaderboard for Challenge:* `{previous_challenge_id}`{date_part}{num_part}\n*Total Players:* {n}\n\n"
         blocks.append({
             "type": "section",
             "text": {"type": "mrkdwn", "text": results_header + table_block},
@@ -629,7 +632,9 @@ def format_softhouse_daily(
         header_line = "Rank".ljust(W_RANK) + " | " + "Player Name".ljust(W_NAME) + " | " + "Score".rjust(W_SCORE) + " | " + "Time (s)".rjust(W_TIME)
         sep_line = "-" * W_RANK + "-+-" + "-" * W_NAME + "-+-" + "-" * W_SCORE + "-+-" + "-" * W_TIME
         n = len(leaderboard_data)
-        text += f"\n\nLeaderboard for Challenge: {previous_challenge_id}\nTotal Players: {n}\n\n"
+        date_part = f" from {results_date_str}" if results_date_str else ""
+        num_part = f" #{previous_challenge_number}"
+        text += f"\n\nLeaderboard for Challenge: {previous_challenge_id}{date_part}{num_part}\nTotal Players: {n}\n\n"
         text += header_line + "\n" + sep_line + "\n"
         for i, entry in enumerate(leaderboard_data[:10], 1):
             nick = (entry.get("nick") or "Unknown")[:W_NAME].ljust(W_NAME)
