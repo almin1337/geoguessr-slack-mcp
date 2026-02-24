@@ -38,10 +38,12 @@ SLACK_CHANNEL_ID = os.getenv("SLACK_CHANNEL_ID")
 from state_storage import load_state, save_state
 # Same approach as fetch_challenge_results.py for previous challenge leaderboard
 from challenge_results import get_leaderboard_for_challenge
+# Resolve latest challenge ID from Gist or Slack (no need to paste)
+from latest_challenge import get_latest_challenge_id
 
 
 def load_previous_challenge_id() -> str | None:
-    return load_state().get("last_challenge_id")
+    return get_latest_challenge_id() or load_state().get("last_challenge_id")
 
 
 def create_challenge_api(cookie: str) -> str | None:
@@ -113,7 +115,8 @@ def main() -> None:
     today_str = cet_now.strftime("%d/%m/%Y")
 
     state = load_state()
-    prev_id = state.get("last_challenge_id")
+    # Prefer latest from Gist (workflow) or Slack (last posted link); fallback to state file
+    prev_id = get_latest_challenge_id() or state.get("last_challenge_id")
     last_date = state.get("last_challenge_date", "")
     # This run's number for today: first of the day = 1, second = 2
     if last_date == today_iso:
