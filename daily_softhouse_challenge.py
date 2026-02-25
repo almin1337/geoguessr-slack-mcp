@@ -132,6 +132,9 @@ def main() -> None:
     # If we have a previous challenge from today, we're the second run → show #2
     if challenge_number == 1 and prev_id and last_date == today_iso:
         challenge_number = 2
+    # 12:00 run must always show #2 (fallback when state is wrong or stale)
+    if challenge_number == 1 and 11 <= cet_now.hour <= 13 and prev_id:
+        challenge_number = 2
     # Date to show for "previous challenge results" (same day or yesterday)
     if last_date == today_iso:
         results_date_str = today_str
@@ -142,8 +145,8 @@ def main() -> None:
             results_date_str = last_date
     else:
         results_date_str = today_str
-    # Leaderboard "from" date: only use when we know prev_id's date (state matches prev_id)
-    if prev_id and state.get("last_challenge_id") == prev_id and last_date:
+    # Leaderboard date: use last_date when we have it (date of the previous challenge we're showing)
+    if prev_id and last_date:
         try:
             leaderboard_date_str = datetime.strptime(last_date, "%Y-%m-%d").strftime("%d/%m/%Y")
         except Exception:
