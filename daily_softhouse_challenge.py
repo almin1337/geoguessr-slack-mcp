@@ -142,6 +142,14 @@ def main() -> None:
             results_date_str = last_date
     else:
         results_date_str = today_str
+    # Leaderboard "from" date: only use when we know prev_id's date (state matches prev_id)
+    if prev_id and state.get("last_challenge_id") == prev_id and last_date:
+        try:
+            leaderboard_date_str = datetime.strptime(last_date, "%Y-%m-%d").strftime("%d/%m/%Y")
+        except Exception:
+            leaderboard_date_str = last_date
+    else:
+        leaderboard_date_str = ""
 
     client = GeoGuessrClient(GEOGUESSR_COOKIE)
     previous_leaderboard = []
@@ -208,6 +216,7 @@ def main() -> None:
         leaderboard_data=previous_leaderboard,
         previous_challenge_id=prev_id or "",
         previous_challenge_number=previous_challenge_number,
+        previous_challenge_date_str=leaderboard_date_str,
     )
 
     if dry_run:
