@@ -145,12 +145,19 @@ def main() -> None:
             results_date_str = last_date
     else:
         results_date_str = today_str
-    # Leaderboard date: use last_date when we have it (date of the previous challenge we're showing)
+    # Leaderboard date: use last_date when we have it; else infer from run (9:00 = yesterday, 12:00 = today)
     if prev_id and last_date:
         try:
             leaderboard_date_str = datetime.strptime(last_date, "%Y-%m-%d").strftime("%d/%m/%Y")
         except Exception:
             leaderboard_date_str = last_date
+    elif prev_id:
+        # Gist may not have last_challenge_date; infer: #2 run → previous was today 9:00, #1 run → previous was yesterday
+        if challenge_number == 2:
+            leaderboard_date_str = today_str
+        else:
+            yesterday = (cet_now - timedelta(days=1)).strftime("%d/%m/%Y")
+            leaderboard_date_str = yesterday
     else:
         leaderboard_date_str = ""
 
