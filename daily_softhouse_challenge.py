@@ -145,19 +145,22 @@ def main() -> None:
             results_date_str = last_date
     else:
         results_date_str = today_str
-    # Leaderboard date: use last_date when we have it; else infer from run (9:00 = yesterday, 12:00 = today)
+    # Leaderboard date: use last_date from state when we have it; else infer (we don't run on weekends)
     if prev_id and last_date:
         try:
             leaderboard_date_str = datetime.strptime(last_date, "%Y-%m-%d").strftime("%d/%m/%Y")
         except Exception:
             leaderboard_date_str = last_date
     elif prev_id:
-        # Gist may not have last_challenge_date; infer: #2 run → previous was today 9:00, #1 run → previous was yesterday
+        # Gist may not have last_challenge_date; infer: #2 → previous was today 9:00; #1 → previous was last weekday
         if challenge_number == 2:
             leaderboard_date_str = today_str
         else:
-            yesterday = (cet_now - timedelta(days=1)).strftime("%d/%m/%Y")
-            leaderboard_date_str = yesterday
+            # Previous run was last weekday (Mon–Fri); go back from today until we hit a weekday
+            d = (cet_now - timedelta(days=1)).date()
+            while d.weekday() >= 5:  # 5=Saturday, 6=Sunday
+                d -= timedelta(days=1)
+            leaderboard_date_str = d.strftime("%d/%m/%Y")
     else:
         leaderboard_date_str = ""
 
